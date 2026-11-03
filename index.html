@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Finanzas</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Para poder instalarla como app -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1117" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-title" content="Finanzas">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script>
+    // Aplica el tema guardado ANTES de pintar la página, para que no parpadee en claro
+    try {
+      const tema = localStorage.getItem("mis-finanzas-tema");
+      if (tema === "oscuro") document.documentElement.dataset.theme = "dark";
+      if (tema === "claro") document.documentElement.dataset.theme = "light";
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>🐷 Mis Finanzas</h1>
+      <p>Controla en qué se va tu dinero, ponte límites y ahorra para lo que de verdad quieres.</p>
+    </div>
+    <div class="controles-cabecera">
+      <label class="selector-mes">Mes
+        <input id="input-mes" type="month">
+      </label>
+      <button id="btn-tema" type="button" class="secundario" title="Cambiar tema: automático, claro u oscuro">🌗 Auto</button>
+      <!-- Solo aparece cuando el navegador permite instalar la app -->
+      <button id="btn-instalar" type="button" title="Instalar Mis Finanzas como app" hidden>📲 Instalar</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- RESUMEN DEL MES -->
+    <section class="resumen">
+      <div class="stat"><span>Ingresos</span><strong id="stat-ingresos" class="positivo"></strong></div>
+      <div class="stat"><span>Gastos</span><strong id="stat-gastos" class="negativo"></strong></div>
+      <div class="stat"><span>Ahorro</span><strong id="stat-ahorro"></strong></div>
+      <div class="stat"><span>Tasa de ahorro</span><strong id="stat-tasa"></strong></div>
+    </section>
+    <p id="consejo" class="consejo"></p>
+
+    <!-- EVOLUCIÓN POR MESES -->
+    <section class="card">
+      <div class="cabecera-grafico">
+        <h2>📈 Últimos 6 meses</h2>
+        <div class="leyenda">
+          <span><i class="muestra ingresos"></i>Ingresos</span>
+          <span><i class="muestra gastos"></i>Gastos</span>
+        </div>
+      </div>
+      <div class="grafico-envoltorio">
+        <div id="grafico"></div>
+        <div id="tooltip-grafico" class="tooltip" hidden></div>
+      </div>
+      <details class="tabla-datos">
+        <summary>Ver como tabla</summary>
+        <table id="tabla-grafico">
+          <thead><tr><th>Mes</th><th>Ingresos</th><th>Gastos</th><th>Ahorro</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </details>
+    </section>
+
+    <div class="panel">
+      <!-- AÑADIR MOVIMIENTO -->
+      <section class="card">
+        <h2 id="titulo-movimiento">➕ Nuevo movimiento</h2>
+        <form id="form-movimiento">
+          <div class="tipo">
+            <label><input type="radio" name="tipo" value="gasto" checked> Gasto</label>
+            <label><input type="radio" name="tipo" value="ingreso"> Ingreso</label>
+          </div>
+          <label>Concepto
+            <input id="mov-concepto" type="text" placeholder="Supermercado, nómina..." maxlength="40" required>
+          </label>
+          <div class="fila">
+            <label>Importe (€)
+              <input id="mov-importe" type="number" min="0.01" step="0.01" placeholder="0,00" required>
+            </label>
+            <label>Fecha
+              <input id="mov-fecha" type="date" required>
+            </label>
+          </div>
+          <label>Categoría
+            <select id="mov-categoria"></select>
+          </label>
+          <label id="campo-repetir" class="check">
+            <input id="mov-repetir" type="checkbox"> 🔁 Repetir cada mes (alquiler, nómina, suscripciones...)
+          </label>
+          <p id="error-movimiento" class="error"></p>
+          <div class="fila">
+            <button id="btn-guardar-mov" type="submit">Guardar</button>
+            <button id="btn-cancelar-edicion" type="button" class="secundario" hidden>Cancelar</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- PRESUPUESTOS -->
+      <section class="card">
+        <h2>🎯 Presupuestos mensuales</h2>
+        <form id="form-presupuesto" class="fila">
+          <select id="pres-categoria"></select>
+          <input id="pres-importe" type="number" min="1" step="1" placeholder="Límite €" required>
+          <button type="submit">Fijar</button>
+        </form>
+        <ul id="lista-presupuestos" class="lista"></ul>
+      </section>
+
+      <!-- GASTO POR CATEGORÍA -->
+      <section class="card">
+        <h2>📊 ¿En qué se va el dinero?</h2>
+        <ul id="lista-categorias" class="lista"></ul>
+      </section>
+
+      <!-- METAS DE AHORRO -->
+      <section class="card">
+        <h2 id="titulo-meta">🏆 Metas de ahorro</h2>
+        <form id="form-meta">
+          <input id="meta-nombre" type="text" placeholder="Viaje a Japón, fondo de emergencia..." maxlength="40" required>
+          <div class="fila">
+            <input id="meta-objetivo" type="number" min="1" step="1" placeholder="Objetivo €" required>
+            <input id="meta-fecha" type="month" title="Fecha límite" required>
+          </div>
+          <!-- Solo se muestra al editar, para corregir lo ahorrado -->
+          <label id="campo-ahorrado" hidden>Ya ahorrado (€)
+            <input id="meta-ahorrado" type="number" min="0" step="0.01">
+          </label>
+          <div class="fila">
+            <button id="btn-guardar-meta" type="submit">Crear meta</button>
+            <button id="btn-cancelar-meta" type="button" class="secundario" hidden>Cancelar</button>
+          </div>
+        </form>
+        <ul id="lista-metas" class="lista"></ul>
+      </section>
+
+      <!-- GASTOS E INGRESOS FIJOS -->
+      <section class="card">
+        <h2>🔁 Gastos e ingresos fijos</h2>
+        <p id="resumen-recurrentes" class="nota"></p>
+        <ul id="lista-recurrentes" class="lista"></ul>
+      </section>
+
+      <!-- CATEGORÍAS PROPIAS -->
+      <section class="card">
+        <h2>🏷️ Categorías</h2>
+        <form id="form-categoria" class="fila">
+          <select id="cat-tipo" aria-label="Tipo de categoría">
+            <option value="gasto">Gasto</option>
+            <option value="ingreso">Ingreso</option>
+          </select>
+          <input id="cat-emoji" type="text" class="campo-emoji" placeholder="🏷️" maxlength="8" aria-label="Emoji (opcional)" title="Emoji (opcional)">
+          <input id="cat-nombre" type="text" placeholder="Nueva (ej. Mascotas)" maxlength="25" required aria-label="Nombre de la categoría">
+          <button type="submit">Añadir</button>
+        </form>
+        <div class="columnas-categorias">
+          <div>
+            <h3>Gastos</h3>
+            <ul id="lista-cat-gasto" class="lista"></ul>
+          </div>
+          <div>
+            <h3>Ingresos</h3>
+            <ul id="lista-cat-ingreso" class="lista"></ul>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- MOVIMIENTOS -->
+    <section class="card">
+      <div class="cabecera-grafico">
+        <h2>🧾 Movimientos</h2>
+        <span id="resumen-filtro" class="nota-inline"></span>
+      </div>
+      <div class="filtros">
+        <input id="filtro-texto" type="search" placeholder="🔍 Buscar por concepto, categoría o importe..." aria-label="Buscar movimientos">
+        <select id="filtro-tipo" aria-label="Filtrar por tipo">
+          <option value="todos">Gastos e ingresos</option>
+          <option value="gasto">Solo gastos</option>
+          <option value="ingreso">Solo ingresos</option>
+        </select>
+        <select id="filtro-categoria" aria-label="Filtrar por categoría"></select>
+        <select id="filtro-alcance" aria-label="Qué meses mostrar">
+          <option value="mes">Mes seleccionado</option>
+          <option value="todo">Todos los meses</option>
+        </select>
+        <button id="btn-limpiar-filtros" type="button" class="secundario" hidden>✕ Limpiar</button>
+      </div>
+      <ul id="lista-movimientos" class="lista"></ul>
+    </section>
+
+    <!-- COPIA DE SEGURIDAD -->
+    <section class="card">
+      <h2>💾 Tus datos</h2>
+      <p class="nota">Los datos solo se guardan en este navegador. Descarga una copia para no perderlos o para pasarlos a otro ordenador.</p>
+      <div class="acciones-datos">
+        <button id="btn-exportar" type="button">⬇️ Exportar copia (.json)</button>
+        <button id="btn-exportar-csv" type="button" class="secundario">📄 Movimientos para Excel (.csv)</button>
+        <!-- El label abre el selector de archivos del input oculto -->
+        <label class="boton secundario">⬆️ Importar copia
+          <input id="input-importar" type="file" accept=".json,application/json" hidden>
+        </label>
+        <button id="btn-reset" type="button" class="peligro">Borrar todos los datos</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Aviso flotante para dar feedback de cada acción -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+/* =============================================
+   COLORES
+   Todos los colores son variables. El modo oscuro
+   solo cambia sus valores; el resto del CSS no se toca.
+   ============================================= */
+:root {
+  color-scheme: light; /* calendarios, scrollbars... del navegador en claro */
+  --bg: #f4f6fb;
+  --card: #ffffff;
+  --campo: #ffffff;
+  --texto: #1d2333;
+  --suave: #6b7287;
+  --primario: #4f46e5;
+  --verde: #15803d;
+  --ambar: #d97706;
+  --rojo: #c62828;
+  --fondo-exito: #15803d; /* fondos con texto blanco encima */
+  --fondo-peligro: #c62828;
+  --fondo-info: #1d2333;
+  --borde: #e2e5ee;
+  --pista: #eceef4;
+  --eje: #c9cdd8;
+  --consejo: #eef0ff;
+  --editando-fondo: #fff7e8;
+  --editando-anillo: #fde9c8;
+  --destello: #dcfce7;
+  --zona-hover: rgba(79, 70, 229, 0.06);
+  --zona-seleccionada: rgba(79, 70, 229, 0.1);
+  --sombra: rgba(0, 0, 0, 0.12);
+  --resaltado: #fde68a;
+  /* Colores del gráfico (paleta pensada para daltonismo) */
+  --serie-ingresos: #2a78d6;
+  --serie-gastos: #eb6834;
+}
+
+/* Valores del tema oscuro. Se repiten dos veces porque CSS no deja
+   reutilizar un bloque: una para el modo "Auto" (si el sistema está
+   en oscuro) y otra para cuando eliges "Oscuro" a mano. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0f1117;
+    --card: #191c24;
+    --campo: #12151c;
+    --texto: #e7e9f0;
+    --suave: #9aa1b5;
+    --primario: #6366f1;
+    --verde: #4ade80;
+    --ambar: #fbbf24;
+    --rojo: #f87171;
+    --fondo-exito: #15803d;
+    --fondo-peligro: #b91c1c;
+    --fondo-info: #2c3242;
+    --borde: #2a2f3c;
+    --pista: #262b37;
+    --eje: #3a4050;
+    --consejo: #1e2140;
+    --editando-fondo: #2a2214;
+    --editando-anillo: #4a3510;
+    --destello: #14532d;
+    --zona-hover: rgba(129, 140, 248, 0.1);
+    --zona-seleccionada: rgba(129, 140, 248, 0.16);
+    --sombra: rgba(0, 0, 0, 0.5);
+    --resaltado: #854d0e;
+    --serie-ingresos: #3987e5;
+    --serie-gastos: #d95926;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f1117;
+  --card: #191c24;
+  --campo: #12151c;
+  --texto: #e7e9f0;
+  --suave: #9aa1b5;
+  --primario: #6366f1;
+  --verde: #4ade80;
+  --ambar: #fbbf24;
+  --rojo: #f87171;
+  --fondo-exito: #15803d;
+  --fondo-peligro: #b91c1c;
+  --fondo-info: #2c3242;
+  --borde: #2a2f3c;
+  --pista: #262b37;
+  --eje: #3a4050;
+  --consejo: #1e2140;
+  --editando-fondo: #2a2214;
+  --editando-anillo: #4a3510;
+  --destello: #14532d;
+  --zona-hover: rgba(129, 140, 248, 0.1);
+  --zona-seleccionada: rgba(129, 140, 248, 0.16);
+  --sombra: rgba(0, 0, 0, 0.5);
+  --resaltado: #854d0e;
+  --serie-ingresos: #3987e5;
+  --serie-gastos: #d95926;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--texto);
+}
+
+header {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 28px 16px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+header h1 { margin: 0; }
+header p { color: var(--suave); margin: 6px 0 0; }
+
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+/* ---------- Resumen ---------- */
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+.stat {
+  background: var(--card);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 16px;
+  display: grid;
+  gap: 4px;
+}
+.stat span { color: var(--suave); font-size: 0.9rem; }
+.stat strong { font-size: 1.5rem; }
+
+.consejo {
+  margin: 0;
+  padding: 12px 16px;
+  background: var(--consejo);
+  border-radius: 10px;
+}
+
+/* ---------- Tarjetas ---------- */
+.panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 20px;
+}
+.card h2 { margin: 0 0 14px; font-size: 1.1rem; }
+
+/* ---------- Formularios ---------- */
+form { display: grid; gap: 12px; }
+.fila { display: flex; gap: 8px; }
+.fila > * { flex: 1; min-width: 0; }
+.fila > button { flex: 0 0 auto; }
+
+label { display: grid; gap: 4px; font-size: 0.9rem; color: var(--suave); }
+.selector-mes { color: var(--texto); }
+
+.tipo { display: flex; gap: 16px; }
+.tipo input { width: auto; }
+.tipo label { display: flex; align-items: center; gap: 6px; color: var(--texto); font-size: 1rem; }
+
+input, select {
+  font: inherit;
+  padding: 10px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  color: var(--texto);
+  background: var(--campo);
+  width: 100%;
+  min-width: 0;
+}
+
+button {
+  font: inherit;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primario);
+  color: white;
+  cursor: pointer;
+}
+button:hover { opacity: 0.9; }
+
+#form-presupuesto, #form-meta { margin-bottom: 12px; }
+.aporte { margin-top: 4px; }
+.aporte input { padding: 6px 10px; }
+.aporte button { padding: 6px 12px; }
+
+/* ---------- Listas ---------- */
+.lista { list-style: none; padding: 0; margin: 0; }
+.lista li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borde);
+}
+.lista li:last-child { border-bottom: none; }
+.lista small { color: var(--suave); display: block; }
+
+.lista li.bloque { display: grid; justify-content: stretch; gap: 6px; }
+.cabecera { display: flex; align-items: center; gap: 8px; }
+.cabecera > :first-child { flex: 1; }
+.fila-derecha { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+
+/* ---------- Barras de progreso ---------- */
+.barra {
+  height: 10px;
+  background: var(--pista);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.relleno {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+.relleno.ok { background: var(--verde); }
+.relleno.aviso { background: var(--ambar); }
+.relleno.pasado { background: var(--rojo); }
+.relleno.neutro { background: var(--primario); }
+.relleno.meta { background: linear-gradient(90deg, #6366f1, #22c55e); }
+
+/* ---------- Varios ---------- */
+.btn-x {
+  background: transparent;
+  color: var(--suave);
+  padding: 2px 8px;
+  font-size: 1rem;
+}
+.btn-x:hover { color: var(--rojo); }
+
+.positivo { color: var(--verde); }
+.negativo { color: var(--rojo); }
+.vacio { color: var(--suave); font-style: italic; }
+.error { color: var(--rojo); margin: 0; min-height: 1em; font-size: 0.9rem; }
+
+.peligro { background: var(--fondo-peligro); justify-self: end; }
+.secundario { background: var(--pista); color: var(--texto); }
+.fila > #btn-guardar-mov, .fila > #btn-guardar-meta { flex: 1; }
+
+/* Sin esto, un <label hidden> con display:grid seguiría viéndose */
+[hidden] { display: none !important; }
+
+/* ---------- Gráfico por meses ---------- */
+.cabecera-grafico {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.cabecera-grafico h2 { margin: 0; }
+.leyenda { display: flex; gap: 16px; font-size: 0.9rem; color: var(--suave); }
+.leyenda span { display: flex; align-items: center; gap: 6px; }
+.muestra { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.muestra.ingresos { background: var(--serie-ingresos); }
+.muestra.gastos { background: var(--serie-gastos); }
+
+.grafico-envoltorio { position: relative; }
+#grafico svg { display: block; max-width: 100%; }
+.rejilla { stroke: var(--pista); }
+.eje { stroke: var(--eje); }
+.etiqueta-eje, .etiqueta-ahorro { fill: var(--suave); font-size: 11px; }
+.etiqueta-mes { fill: var(--texto); font-size: 12px; }
+.barra-ingresos { fill: var(--serie-ingresos); }
+.barra-gastos { fill: var(--serie-gastos); }
+/* Barras y textos dejan pasar el ratón a la zona de detrás */
+#grafico path, #grafico text { pointer-events: none; }
+.zona { fill: transparent; cursor: pointer; }
+.columna:hover .zona { fill: var(--zona-hover); }
+.columna.seleccionada .zona { fill: var(--zona-seleccionada); }
+.columna.seleccionada .etiqueta-mes { font-weight: 700; }
+
+.tooltip {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: grid;
+  gap: 4px;
+  min-width: 180px;
+  padding: 10px 12px;
+  background: var(--card);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px var(--sombra);
+  font-size: 0.85rem;
+  pointer-events: none;
+  z-index: 5;
+}
+.tip-fila { display: flex; justify-content: space-between; gap: 12px; }
+.tip-fila span { display: flex; align-items: center; gap: 6px; color: var(--suave); }
+.tooltip small { color: var(--suave); }
+
+.tabla-datos { margin-top: 8px; font-size: 0.9rem; }
+.tabla-datos summary { cursor: pointer; color: var(--suave); }
+.tabla-datos table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.tabla-datos th, .tabla-datos td { text-align: right; padding: 6px 4px; border-bottom: 1px solid var(--borde); }
+.tabla-datos th:first-child, .tabla-datos td:first-child { text-align: left; }
+
+/* ---------- Buscar y filtrar ---------- */
+.filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+#filtro-texto { flex: 1 1 100%; }
+.filtros select { flex: 1 1 200px; width: auto; } /* 200px para que no se corte el texto */
+.filtros button { flex: 0 0 auto; }
+.nota-inline { color: var(--suave); font-size: 0.9rem; }
+mark { background: var(--resaltado); color: inherit; border-radius: 3px; padding: 0 1px; }
+
+/* ---------- Categorías propias ---------- */
+#form-categoria { flex-wrap: wrap; }
+#cat-tipo { flex: 1 1 100px; }
+#cat-nombre { flex: 1 1 160px; }
+.fila > .campo-emoji { flex: 0 0 56px; text-align: center; }
+.columnas-categorias {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+.columnas-categorias h3 { margin: 0 0 4px; font-size: 0.95rem; color: var(--suave); }
+.columnas-categorias .fila { flex-wrap: wrap; }
+.columnas-categorias .fila select { flex: 1 1 100%; } /* el desplegable de "mover a" ocupa su propia línea */
+
+/* ---------- Casilla "Repetir cada mes" ---------- */
+.check { display: flex; align-items: center; gap: 8px; color: var(--texto); cursor: pointer; }
+.check input { width: auto; }
+.en-pausa { opacity: 0.55; }
+.form-fijo { gap: 10px; padding: 4px 0; }
+.form-fijo .principal { flex: 1; }
+
+/* ---------- Tus datos ---------- */
+.nota { color: var(--suave); margin: 0 0 12px; font-size: 0.9rem; }
+.acciones-datos { display: flex; flex-wrap: wrap; gap: 8px; }
+.acciones-datos .peligro { margin-left: auto; }
+.boton {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.boton:hover { opacity: 0.9; }
+
+/* ---------- Modo edición ---------- */
+.card.editando { border-color: var(--ambar); box-shadow: 0 0 0 3px var(--editando-anillo); }
+.lista li.editando { background: var(--editando-fondo); border-radius: 8px; padding-left: 8px; padding-right: 8px; }
+
+/* ---------- Resaltado tras crear/cambiar ---------- */
+.destacado { animation: destello 1.4s ease; border-radius: 8px; }
+@keyframes destello {
+  0%   { background: var(--destello); }
+  100% { background: transparent; }
+}
+
+/* ---------- Avisos (toast) ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translate(-50%, 20px);
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 32px);
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: white;
+  background: var(--fondo-info);
+  box-shadow: 0 8px 24px var(--sombra);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 10;
+}
+.toast.visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.toast.exito { background: var(--fondo-exito); }
+.toast.error { background: var(--fondo-peligro); }
+
+/* ---------- Botón de tema ---------- */
+.controles-cabecera { display: flex; align-items: flex-end; gap: 8px; }
+#btn-tema { white-space: nowrap; }
+
+/* Cambio de tema suave */
+body, .card, .stat, input, select, .consejo { transition: background-color 0.25s ease, border-color 0.25s ease; }
+.toast button { background: rgba(255, 255, 255, 0.2); padding: 4px 10px; }
